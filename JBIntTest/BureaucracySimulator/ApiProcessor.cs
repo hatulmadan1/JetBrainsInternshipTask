@@ -3,13 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BureaucracySimulator
 {
     public class ApiProcessor
     {
-        private static Organization _bureau;
-        private static StumpList _stumps;
+        private Organization _bureau;
+        private StumpList _stumps;
+
+        private Task precalc;
+        private bool _isPrecalcReady;
+        private Mutex precalcMutex = new Mutex();
 
         public void StartSettingConfiguration(int departmentsNumber, int stumpsNumber)
         {
@@ -23,6 +29,12 @@ namespace BureaucracySimulator
             int inStumpTrue, int outStumpTrue, int nextDepartmentTrue, 
             int inStumpFalse, int outStumpFalse, int nextDepartmentFalse)
         {
+            /*threadController.WaitOne();
+            lock (threadController)
+            {
+                processingThreads.Add(Thread.CurrentThread.ManagedThreadId);
+            }
+            threadController.ReleaseMutex();*/
             if (conditionalStump >= _stumps.StumpListArray.Count ||
                 inStumpTrue >= _stumps.StumpListArray.Count ||
                 outStumpTrue >= _stumps.StumpListArray.Count ||
@@ -48,10 +60,26 @@ namespace BureaucracySimulator
                         ) 
                     )
                 );
+            /*threadController.WaitOne();
+            lock (threadController)
+            {
+                processingThreads.Remove(Thread.CurrentThread.ManagedThreadId);
+                if (processingThreads.Count == 0)
+                {
+                    evt.Set();
+                }
+            }
+            threadController.ReleaseMutex();*/
         }
 
         public void AddDepartmentWithUnconditionalRule(int departmentId, int inStump, int outStump, int nextDepartment)
         {
+            /*threadController.WaitOne();
+            lock (threadController)
+            {
+                processingThreads.Add(Thread.CurrentThread.ManagedThreadId);
+            }
+            threadController.ReleaseMutex();*/
             if (inStump >= _stumps.StumpListArray.Count ||
                 outStump >= _stumps.StumpListArray.Count)
             {
@@ -64,14 +92,20 @@ namespace BureaucracySimulator
             }
 
             _bureau.AddDepartment(departmentId, new Department(new UnconditionalRule(inStump, outStump, nextDepartment)));
+            /*threadController.WaitOne();
+            lock (threadController)
+            {
+                processingThreads.Remove(Thread.CurrentThread.ManagedThreadId);
+                if (processingThreads.Count == 0)
+                {
+                    evt.Set();
+                }
+            }
+            threadController.ReleaseMutex();*/
         }
 
-        public void FinishSettingConfiguration(int start, int end)
+        public void SetStartEndDepartments(int start, int end)
         {
-            if (!_bureau.IsConfigCorrect())
-            {
-                throw new ArgumentNullException("The declared number of departments does not match the actual number of departments.");
-            }
             if (start >= _bureau.DepartmentsNumber)
             {
                 throw new IndexOutOfRangeException("Incorrect start department: now such department in this organization.");
@@ -81,10 +115,28 @@ namespace BureaucracySimulator
             {
                 throw new IndexOutOfRangeException("Incorrect end department: now such department in this organization.");
             }
-            _bureau.ProcessStumpList(_stumps, start, end);
+
+            precalc = new Task(() => _bureau.ProcessStumpList(_stumps, start, end));
         }
         public ApiRespond ProcessRequest(int departmentId)
         {
+            precalcMutex.WaitOne();
+            lock (precalcMutex)
+            {
+                if (!_isPrecalcReady)
+                {
+                    if (!_bureau.IsConfigCorrect())
+                    {
+                        throw new Exception("The declared number of departments does not match the actual number of departments.");
+                    }
+
+                    precalc.Start();
+                    precalc.Wait();
+                    _isPrecalcReady = true;
+                }
+            }
+            precalcMutex.ReleaseMutex();
+
             if (departmentId >= _bureau.DepartmentsNumber)
             {
                 throw new IndexOutOfRangeException("Incorrect department: now such department in this organization.");
@@ -128,6 +180,7 @@ namespace BureaucracySimulator
             {
                 DepartmentId = departmentId;
                 EternalCycle = eternalCycle;
+                UncrossedStumps = new List<List<int>>();
                 if (stumpsData == "")
                 {
                     IsVisited = false;
@@ -136,7 +189,7 @@ namespace BureaucracySimulator
                 {
                     IsVisited = true;
                     var data = JsonSerializer.Deserialize<KeyValuePair<int, Dictionary<int, List<string>>>>(stumpsData).Value.Values;
-                    UncrossedStumps = new List<List<int>>();
+                    
                     foreach (var elem in data)
                     {
                         foreach (var stumpMask in elem)

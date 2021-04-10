@@ -13,25 +13,24 @@ namespace BureaucracySimulator
 
         private int _actualDepartmentsNumber;
 
-        private readonly Mutex _addDepartment;
+        private Mutex _addDepartmentMutex = new Mutex();
 
         public Organization(int departmentsNumber)
         {
             DepartmentsNumber = departmentsNumber;
             Departments = new Department[departmentsNumber];
             _actualDepartmentsNumber = 0;
-            _addDepartment = new Mutex();
         }
 
         public void AddDepartment(int departmentId,  Department department)
         {
-            _addDepartment.WaitOne();
-            lock (_addDepartment)
+            _addDepartmentMutex.WaitOne();
+            lock (_addDepartmentMutex)
             {
                 Departments[departmentId] = department;
                 _actualDepartmentsNumber++;
             }
-            _addDepartment.ReleaseMutex();
+            _addDepartmentMutex.ReleaseMutex();
         }
 
         public bool IsConfigCorrect()
