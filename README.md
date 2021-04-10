@@ -23,7 +23,7 @@
 * департаменты нумеруются с 0
 * печати нумеруются с 0
 
-API поддерживает конкурентные запросы. 
+API поддерживает конкурентные запросы и конкурентное добавление департаментов. 
 
 _______________________________________________________________________________________________________________________________________________
 
@@ -50,4 +50,4 @@ Expected that:
 * departments are numbered from 0
 * stamps are numbered from 0
 
-The API supports concurrent requests.
+The API supports concurrent requests and concurrent adding new departments.
