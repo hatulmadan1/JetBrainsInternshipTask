@@ -31,12 +31,13 @@ API access is provided through a public class `BureaucracySimulator.ApiProcessor
 This class contains the following methods for setting organiztion configuration:
 * `public void StartSettingConfiguration(int departmentsNumber, int stumpsNumber)` - method that sets number of deparments and number of stumps
 * `public void AddDepartmentWithConditionalRule(
-            `int departmentId,
-            `int conditionalStump, 
-            `int inStumpTrue, int outStumpTrue, int nextDepartmentTrue, 
-            `int inStumpFalse, int outStumpFalse, int nextDepartmentFalse)` - method that adds a department with a conditional rule into the organization
+            int departmentId,
+            int conditionalStump, 
+            int inStumpTrue, int outStumpTrue, int nextDepartmentTrue, 
+            int inStumpFalse, int outStumpFalse, int nextDepartmentFalse)` - method that adds a department with a conditional rule into the organization
 * `public void AddDepartmentWithUnconditionalRule(int departmentId, int inStump, int outStump, int nextDepartment)` - method that adds a department with an unconditional rule into the organization
 * `public void SetStartEndDepartments(int start, int end)` - method that sets first and last departments of the journey
+
 Method `public ApiRespond ProcessRequest(int departmentId)` processes requests.  
 It returns an object of `ApiRespond` class, which contains the following fields and methods:
 * `public int DepartmentId` - department number for which this answer is given
