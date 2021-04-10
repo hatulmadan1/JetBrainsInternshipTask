@@ -1,21 +1,19 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.IO;
+using System.Text.Json;
 
 namespace BureaucracySimulator
 {
-    public class Organization
+    internal class Organization
     {
-        public int DepartmentsNumber { get; private set; }
-        public int StumpsNumber { get; private set; }
-        public List<Department> Departments { get; private set; }
+        public int DepartmentsNumber { get; }
+        public List<Department> Departments { get; }
 
-        public Organization(int departmentsNumber, int stumpsNumber)
+        public Organization(int departmentsNumber)
         {
             DepartmentsNumber = departmentsNumber;
-            StumpsNumber = stumpsNumber;
-            Departments = new List<Department>();
+            Departments = new List<Department>(departmentsNumber);
         }
 
         public void AddDepartment(Department department)
@@ -25,26 +23,59 @@ namespace BureaucracySimulator
 
         public void ProcessStumpList(StumpList stumpList, int start, int end)
         {
-            List<Dictionary<int, List<BitArray>>> masks = new List<Dictionary<int, List<BitArray>>>(DepartmentsNumber);
-            Dfs(start);
-
-            void Dfs(int departmentId)
+            try
             {
-                masks[departmentId] = new Dictionary<int, List<BitArray>>();
-                int nextDepartment = Departments[departmentId].ProcessVisit(stumpList);
-                int currentMaskHash = stumpList.GetHashCode();
-                if (masks[departmentId][currentMaskHash] == null)
+                Dictionary<int, Dictionary<int, List<string>>> masks = new Dictionary<int, Dictionary<int, List<string>>>();
+                int departmentId = start, nextDepartmentId = start;
+                bool eternalCycle = false;
+
+                do
                 {
-                    masks[departmentId][currentMaskHash] = new List<BitArray>();
-                }
-                if (!masks[departmentId].ContainsKey(currentMaskHash) || !masks[departmentId][currentMaskHash].Contains(stumpList.StumpListArray)) //вот здесь надо проверять ещё и на уникальность не только по хэшу
+                    departmentId = nextDepartmentId;
+                    if (!masks.ContainsKey(departmentId))
+                    {
+                        masks.Add(departmentId, new Dictionary<int, List<string>>());
+                    }
+                    nextDepartmentId = Departments[departmentId].ProcessVisit(stumpList);
+                    int currentMaskHash = stumpList.GetHashCode();
+                    string currentMask = stumpList.ToString();
+                    if (!masks[departmentId].ContainsKey(currentMaskHash))
+                    {
+                        masks[departmentId].Add(currentMaskHash, new List<string>());
+                    }
+                    if (!masks[departmentId].ContainsKey(currentMaskHash) ||
+                        !masks[departmentId][currentMaskHash].Contains(currentMask)
+                    )
+                    {
+                        masks[departmentId][currentMaskHash].Add(currentMask);
+                    }
+                    else
+                    {
+                        eternalCycle = true;
+                        break;
+                    }
+                } while (departmentId != end);
+
+                SavePrecalcResults(eternalCycle, masks);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        private void SavePrecalcResults(bool eternalCycle, Dictionary<int, Dictionary<int, List<string>>> masks)
+        {
+            using (StreamWriter sw = new StreamWriter("data.json"))
+            {
+                if (eternalCycle) sw.WriteLine("EternalCycle");
+                foreach (var states in masks)
                 {
-                    masks[departmentId][currentMaskHash].Add(stumpList.StumpListArray);
-                    Dfs(nextDepartment);
+                    sw.Write(JsonSerializer.Serialize(states));
+                    sw.WriteLine();
                 }
             }
-
-            //ответом будет masks
         }
     }
 }

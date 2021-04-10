@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BureaucracySimulator
 {
-    public class UnconditionalRule : Rule
+    internal class UnconditionalRule : Rule
     {
         public int InStump { get; protected set; }
         public int OutStump { get; protected set; }

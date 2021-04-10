@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BureaucracySimulator
 {
-    public class Department
+    internal class Department
     {
-        public Rule DepartmentRule { get; private set; }
+        public Rule DepartmentRule { get; }
 
         public Department(Rule rule)
         {
@@ -18,29 +13,32 @@ namespace BureaucracySimulator
 
         public int ProcessVisit(StumpList stumpList)
         {
-            int nextDepartment = -1;
-            if (DepartmentRule.Type == Rule.RuleType.Unconditional)
+            try
             {
-                nextDepartment = ((UnconditionalRule) DepartmentRule).NextDepartment;
-            }
-            else if (DepartmentRule.Type == Rule.RuleType.Conditional)
-            {
-                if (stumpList.StumpListArray[((ConditionalRule) DepartmentRule).ConditionalStampId])
+                var nextDepartment = -1;
+                switch (DepartmentRule.Type)
                 {
-                    nextDepartment = ((ConditionalRule) DepartmentRule).IfTrue.NextDepartment;
+                    case Rule.RuleType.Unconditional:
+                        nextDepartment = ((UnconditionalRule)DepartmentRule).NextDepartment;
+                        break;
+                    case Rule.RuleType.Conditional:
+                        nextDepartment = 
+                            stumpList.StumpListArray[((ConditionalRule)DepartmentRule).ConditionalStampId] 
+                                ? ((ConditionalRule)DepartmentRule).IfTrue.NextDepartment 
+                                : ((ConditionalRule)DepartmentRule).IfFalse.NextDepartment;
+                        break;
+                    default:
+                        throw new Exception("Department has no rule type, undefined behaviour");
                 }
-                else
-                {
-                    nextDepartment = ((ConditionalRule) DepartmentRule).IfFalse.NextDepartment;
-                }
-            }
-            else
-            {
-                throw new Exception("Department has no rule type, undefined behaviour");
-            }
 
-            stumpList.ChangeByDepartmentRule(DepartmentRule);
-            return nextDepartment;
+                stumpList.ChangeByDepartmentRule(DepartmentRule);
+                return nextDepartment;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }
