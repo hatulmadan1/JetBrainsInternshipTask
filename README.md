@@ -4,10 +4,10 @@
 Данный класс содержит следующие методы для задания конфигурации:
 * `public void StartSettingConfiguration(int departmentsNumber, int stumpsNumber)` - метод, задающий число департаментов и печатей
 * `public void AddDepartmentWithConditionalRule(
-            `int departmentId,
-            `int conditionalStump, 
-            `int inStumpTrue, int outStumpTrue, int nextDepartmentTrue, 
-            `int inStumpFalse, int outStumpFalse, int nextDepartmentFalse)` - метод, добавляющий в организацию департамент с условным правилом
+            int departmentId,
+            int conditionalStump, 
+            int inStumpTrue, int outStumpTrue, int nextDepartmentTrue, 
+            int inStumpFalse, int outStumpFalse, int nextDepartmentFalse)` - метод, добавляющий в организацию департамент с условным правилом
 * `public void AddDepartmentWithUnconditionalRule(int departmentId, int inStump, int outStump, int nextDepartment)` - метод, добавляющий в организацию департамент с безусловным правилом
 * `public void SetStartEndDepartments(int start, int end)` - метод, задающий начальный и конечный департаменты
 
