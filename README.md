@@ -14,7 +14,7 @@
 За обработку запросов отвечает метод `public ApiRespond ProcessRequest(int departmentId)`, 
 возвращающий объект класса `ApiRespond`, содержащего
 * `public int DepartmentId` - номер департамента, для которого дан этот ответ
-* `public bool EternalCycle` - информация о том, содержится ли в конфигурации на пути по департаментам вечный цикл
+* `public bool EternalCycle` - содержится ли в конфигурации на пути по департаментам вечный цикл
 * `public bool IsVisited` - посещен ли данный департамент
 * `public List<List<int>> UncrossedStumps` - список возможных списков незачеркнутых печатей
 
@@ -41,7 +41,7 @@ This class contains the following methods for setting organiztion configuration:
 Method `public ApiRespond ProcessRequest(int departmentId)` processes requests.  
 It returns an object of `ApiRespond` class, which contains the following fields and methods:
 * `public int DepartmentId` - department number for which this answer is given
-* `public bool EternalCycle` - information about whether the configuration contains an eternal loop on the way
+* `public bool EternalCycle` - does configuration contain an eternal loop on the way or not
 * `public bool IsVisited` - is the department visited or not
 * `public List<List<int>> UncrossedStumps` - the list of all possible sets of uncrossed stumps
 
