@@ -2,23 +2,41 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Threading;
 
 namespace BureaucracySimulator
 {
     internal class Organization
     {
         public int DepartmentsNumber { get; }
-        public List<Department> Departments { get; }
+        public Department[] Departments { get; }
+
+        private int _actualDepartmentsNumber;
+
+        private readonly Mutex _addDepartment;
 
         public Organization(int departmentsNumber)
         {
             DepartmentsNumber = departmentsNumber;
-            Departments = new List<Department>(departmentsNumber);
+            Departments = new Department[departmentsNumber];
+            _actualDepartmentsNumber = 0;
+            _addDepartment = new Mutex();
         }
 
-        public void AddDepartment(Department department)
+        public void AddDepartment(int departmentId,  Department department)
         {
-            Departments.Add(department);
+            _addDepartment.WaitOne();
+            lock (_addDepartment)
+            {
+                Departments[departmentId] = department;
+                _actualDepartmentsNumber++;
+            }
+            _addDepartment.ReleaseMutex();
+        }
+
+        public bool IsConfigCorrect()
+        {
+            return DepartmentsNumber == _actualDepartmentsNumber;
         }
 
         public void ProcessStumpList(StumpList stumpList, int start, int end)
@@ -39,16 +57,17 @@ namespace BureaucracySimulator
                     nextDepartmentId = Departments[departmentId].ProcessVisit(stumpList);
                     int currentMaskHash = stumpList.GetHashCode();
                     string currentMask = stumpList.ToString();
+
                     if (!masks[departmentId].ContainsKey(currentMaskHash))
                     {
                         masks[departmentId].Add(currentMaskHash, new List<string>());
                     }
+
                     if (!masks[departmentId].ContainsKey(currentMaskHash) ||
-                        !masks[departmentId][currentMaskHash].Contains(currentMask)
-                    )
+                        !masks[departmentId][currentMaskHash].Contains(currentMask))
                     {
                         masks[departmentId][currentMaskHash].Add(currentMask);
-                    }
+                    } 
                     else
                     {
                         eternalCycle = true;

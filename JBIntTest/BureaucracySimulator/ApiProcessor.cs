@@ -17,7 +17,8 @@ namespace BureaucracySimulator
             _stumps ??= new StumpList(stumpsNumber);
         }
         
-        public int AddDepartmentWithConditionalRule(
+        public void AddDepartmentWithConditionalRule(
+            int departmentId,
             int conditionalStump, 
             int inStumpTrue, int outStumpTrue, int nextDepartmentTrue, 
             int inStumpFalse, int outStumpFalse, int nextDepartmentFalse)
@@ -37,6 +38,7 @@ namespace BureaucracySimulator
                 throw new IndexOutOfRangeException("Incorrect next department: now such department in this organization.");
             }
             _bureau.AddDepartment(
+                departmentId,
                 new Department(
                     new ConditionalRule(
                         conditionalStump, 
@@ -46,10 +48,9 @@ namespace BureaucracySimulator
                         ) 
                     )
                 );
-            return _bureau.Departments.Count - 1;
         }
 
-        public int AddDepartmentWithUnconditionalRule(int inStump, int outStump, int nextDepartment)
+        public void AddDepartmentWithUnconditionalRule(int departmentId, int inStump, int outStump, int nextDepartment)
         {
             if (inStump >= _stumps.StumpListArray.Count ||
                 outStump >= _stumps.StumpListArray.Count)
@@ -62,16 +63,14 @@ namespace BureaucracySimulator
                 throw new IndexOutOfRangeException("Incorrect next department: now such department in this organization.");
             }
 
-            _bureau.AddDepartment(new Department(new UnconditionalRule(inStump, outStump, nextDepartment)));
-            return _bureau.Departments.Count - 1;
+            _bureau.AddDepartment(departmentId, new Department(new UnconditionalRule(inStump, outStump, nextDepartment)));
         }
 
         public void FinishSettingConfiguration(int start, int end)
         {
-            if (_bureau.DepartmentsNumber != _bureau.Departments.Count)
+            if (!_bureau.IsConfigCorrect())
             {
                 throw new ArgumentNullException("The declared number of departments does not match the actual number of departments.");
-                //
             }
             if (start >= _bureau.DepartmentsNumber)
             {

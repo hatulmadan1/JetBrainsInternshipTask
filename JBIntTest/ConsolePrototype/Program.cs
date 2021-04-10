@@ -10,9 +10,9 @@ namespace ConsolePrototype
         {
             ApiProcessor api = new ApiProcessor();
             api.StartSettingConfiguration(3, 2);
-            api.AddDepartmentWithUnconditionalRule(0, 1, 1);
-            api.AddDepartmentWithUnconditionalRule(1, 0, 0);
-            api.AddDepartmentWithUnconditionalRule(1, 1, 0);
+            api.AddDepartmentWithUnconditionalRule(0, 0, 1, 1);
+            api.AddDepartmentWithUnconditionalRule(1,1, 0, 0);
+            api.AddDepartmentWithUnconditionalRule(2,1, 1, 0);
             api.FinishSettingConfiguration(0, 1);
 
             var result = api.ProcessRequest(0);
