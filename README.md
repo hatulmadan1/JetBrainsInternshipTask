@@ -42,7 +42,7 @@ Method `public ApiRespond ProcessRequest(int departmentId)` processes requests.
 It returns an object of `ApiRespond` class, which contains the following fields and methods:
 * `public int DepartmentId` - department number for which this answer is given
 * `public bool EternalCycle` - information about whether the configuration contains an eternal loop on the way
-* `public bool IsVisited` - is the department visited
+* `public bool IsVisited` - is the department visited or not
 * `public List<List<int>> UncrossedStumps` - the list of all possible sets of uncrossed stumps
 
 Expected that:
