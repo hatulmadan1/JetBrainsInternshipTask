@@ -89,20 +89,19 @@ namespace BureaucracySimulator
         public ApiRespond ProcessRequest(int departmentId)
         {
             precalcMutex.WaitOne();
-            lock (precalcMutex)
+            
+            if (!_isPrecalcReady)
             {
-                if (!_isPrecalcReady)
+                if (!_bureau.IsConfigCorrect())
                 {
-                    if (!_bureau.IsConfigCorrect())
-                    {
-                        throw new Exception("The declared number of departments does not match the actual number of departments.");
-                    }
-
-                    precalc.Start();
-                    precalc.Wait();
-                    _isPrecalcReady = true;
+                    throw new Exception("The declared number of departments does not match the actual number of departments.");
                 }
+
+                precalc.Start();
+                precalc.Wait();
+                _isPrecalcReady = true;
             }
+            
             precalcMutex.ReleaseMutex();
 
             if (departmentId >= _bureau.DepartmentsNumber)

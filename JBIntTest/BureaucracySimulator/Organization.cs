@@ -25,11 +25,10 @@ namespace BureaucracySimulator
         public void AddDepartment(int departmentId,  Department department)
         {
             _addDepartmentMutex.WaitOne();
-            lock (_addDepartmentMutex)
-            {
-                Departments[departmentId] = department;
-                _actualDepartmentsNumber++;
-            }
+
+            Departments[departmentId] = department;
+            _actualDepartmentsNumber++;
+            
             _addDepartmentMutex.ReleaseMutex();
         }
 
