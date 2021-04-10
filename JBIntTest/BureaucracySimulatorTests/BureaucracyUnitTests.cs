@@ -148,23 +148,24 @@ namespace BureaucracySimulatorTests
         {
             ApiProcessor api = new ApiProcessor();
             api.StartSettingConfiguration(3, 2);
-            Thread thread1 = new Thread(() =>
-                api.AddDepartmentWithUnconditionalRule(
-                    0, 0, 1, 1)
-                );
-            thread1.Start();
 
-            Thread thread2 = new Thread(() => 
-                api.AddDepartmentWithUnconditionalRule(
-                    1, 1, 0, 0)
-                );
-            thread2.Start();
-            Thread thread3 = new Thread(() => 
-                api.AddDepartmentWithUnconditionalRule(
-                    2, 1, 1, 0)
-                
-                );
-            thread3.Start();
+            Task[] tasks = new[]
+            {
+                new Task(() => api.AddDepartmentWithUnconditionalRule(
+                    0, 0, 1, 1)),
+                new Task(() => api.AddDepartmentWithUnconditionalRule(
+                    1, 1, 0, 0)),
+                new Task(() => api.AddDepartmentWithUnconditionalRule(
+                    2, 1, 1, 0)),
+            };
+
+            foreach (var task in tasks)
+            {
+                task.Start();
+            }
+
+            Task.WaitAll(tasks);
+
             api.SetStartEndDepartments(0, 1);
 
             var result = api.ProcessRequest(0);

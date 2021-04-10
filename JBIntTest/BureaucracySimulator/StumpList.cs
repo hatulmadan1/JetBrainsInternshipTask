@@ -48,10 +48,10 @@ namespace BureaucracySimulator
             
         }
 
-        public override int GetHashCode()
+        /*public override int GetHashCode()
         {
             return StumpListArray.GetHashCode();
-        }
+        }*/
 
         public override string ToString()
         {

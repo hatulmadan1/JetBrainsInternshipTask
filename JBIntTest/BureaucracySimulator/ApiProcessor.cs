@@ -29,12 +29,6 @@ namespace BureaucracySimulator
             int inStumpTrue, int outStumpTrue, int nextDepartmentTrue, 
             int inStumpFalse, int outStumpFalse, int nextDepartmentFalse)
         {
-            /*threadController.WaitOne();
-            lock (threadController)
-            {
-                processingThreads.Add(Thread.CurrentThread.ManagedThreadId);
-            }
-            threadController.ReleaseMutex();*/
             if (conditionalStump >= _stumps.StumpListArray.Count ||
                 inStumpTrue >= _stumps.StumpListArray.Count ||
                 outStumpTrue >= _stumps.StumpListArray.Count ||
@@ -60,26 +54,10 @@ namespace BureaucracySimulator
                         ) 
                     )
                 );
-            /*threadController.WaitOne();
-            lock (threadController)
-            {
-                processingThreads.Remove(Thread.CurrentThread.ManagedThreadId);
-                if (processingThreads.Count == 0)
-                {
-                    evt.Set();
-                }
-            }
-            threadController.ReleaseMutex();*/
         }
 
         public void AddDepartmentWithUnconditionalRule(int departmentId, int inStump, int outStump, int nextDepartment)
         {
-            /*threadController.WaitOne();
-            lock (threadController)
-            {
-                processingThreads.Add(Thread.CurrentThread.ManagedThreadId);
-            }
-            threadController.ReleaseMutex();*/
             if (inStump >= _stumps.StumpListArray.Count ||
                 outStump >= _stumps.StumpListArray.Count)
             {
@@ -92,16 +70,6 @@ namespace BureaucracySimulator
             }
 
             _bureau.AddDepartment(departmentId, new Department(new UnconditionalRule(inStump, outStump, nextDepartment)));
-            /*threadController.WaitOne();
-            lock (threadController)
-            {
-                processingThreads.Remove(Thread.CurrentThread.ManagedThreadId);
-                if (processingThreads.Count == 0)
-                {
-                    evt.Set();
-                }
-            }
-            threadController.ReleaseMutex();*/
         }
 
         public void SetStartEndDepartments(int start, int end)

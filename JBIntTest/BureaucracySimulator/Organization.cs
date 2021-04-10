@@ -54,9 +54,9 @@ namespace BureaucracySimulator
                         masks.Add(departmentId, new Dictionary<int, List<string>>());
                     }
                     nextDepartmentId = Departments[departmentId].ProcessVisit(stumpList);
-                    int currentMaskHash = stumpList.GetHashCode();
+                    
                     string currentMask = stumpList.ToString();
-
+                    int currentMaskHash = currentMask.GetHashCode();
                     if (!masks[departmentId].ContainsKey(currentMaskHash))
                     {
                         masks[departmentId].Add(currentMaskHash, new List<string>());
