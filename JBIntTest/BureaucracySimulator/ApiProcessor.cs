@@ -29,28 +29,28 @@ namespace BureaucracySimulator
             int inStumpTrue, int outStumpTrue, int nextDepartmentTrue, 
             int inStumpFalse, int outStumpFalse, int nextDepartmentFalse)
         {
-            if (conditionalStump >= _stumps.StumpListArray.Count ||
-                inStumpTrue >= _stumps.StumpListArray.Count ||
-                outStumpTrue >= _stumps.StumpListArray.Count ||
-                inStumpFalse >= _stumps.StumpListArray.Count ||
-                outStumpFalse >= _stumps.StumpListArray.Count)
+            if (!InRange(_stumps.StumpListArray.Count, conditionalStump) ||
+                !InRange(_stumps.StumpListArray.Count, inStumpTrue) ||
+                !InRange(_stumps.StumpListArray.Count, outStumpTrue) ||
+                !InRange(_stumps.StumpListArray.Count, inStumpFalse) ||
+                !InRange(_stumps.StumpListArray.Count, outStumpFalse))
             {
                 throw new IndexOutOfRangeException("Incorrect stump number: now such stump in this organization.");
             }
 
-            if (nextDepartmentTrue >= _bureau.DepartmentsNumber ||
-                nextDepartmentFalse >= _bureau.DepartmentsNumber)
+            if (!InRange(_bureau.DepartmentsNumber, nextDepartmentTrue) ||
+                !InRange(_bureau.DepartmentsNumber, nextDepartmentFalse))
             {
                 throw new IndexOutOfRangeException("Incorrect next department: now such department in this organization.");
             }
             _bureau.AddDepartment(
-                departmentId,
+                --departmentId,
                 new Department(
                     new ConditionalRule(
-                        conditionalStump, 
+                        --conditionalStump, 
                         new UnconditionalRule(
-                            inStumpTrue, outStumpTrue, nextDepartmentTrue), 
-                        new UnconditionalRule(inStumpFalse, outStumpFalse, nextDepartmentFalse)
+                            --inStumpTrue, --outStumpTrue, --nextDepartmentTrue), 
+                        new UnconditionalRule(--inStumpFalse, --outStumpFalse, --nextDepartmentFalse)
                         ) 
                     )
                 );
@@ -58,33 +58,33 @@ namespace BureaucracySimulator
 
         public void AddDepartmentWithUnconditionalRule(int departmentId, int inStump, int outStump, int nextDepartment)
         {
-            if (inStump >= _stumps.StumpListArray.Count ||
-                outStump >= _stumps.StumpListArray.Count)
+            if (!InRange(_stumps.StumpListArray.Count, inStump) ||
+                !InRange(_stumps.StumpListArray.Count, outStump))
             {
                 throw new IndexOutOfRangeException("Incorrect stump number: now such stump in this organization.");
             }
 
-            if (nextDepartment >= _bureau.DepartmentsNumber)
+            if (!InRange(_bureau.DepartmentsNumber, nextDepartment))
             {
                 throw new IndexOutOfRangeException("Incorrect next department: now such department in this organization.");
             }
 
-            _bureau.AddDepartment(departmentId, new Department(new UnconditionalRule(inStump, outStump, nextDepartment)));
+            _bureau.AddDepartment(--departmentId, new Department(new UnconditionalRule(--inStump, --outStump, --nextDepartment)));
         }
 
         public void SetStartEndDepartments(int start, int end)
         {
-            if (start >= _bureau.DepartmentsNumber)
+            if (!InRange(_bureau.DepartmentsNumber, start))
             {
                 throw new IndexOutOfRangeException("Incorrect start department: now such department in this organization.");
             }
 
-            if (end >= _bureau.DepartmentsNumber)
+            if (!InRange(_bureau.DepartmentsNumber, end))
             {
                 throw new IndexOutOfRangeException("Incorrect end department: now such department in this organization.");
             }
 
-            precalc = new Task(() => _bureau.ProcessStumpList(_stumps, start, end));
+            precalc = new Task(() => _bureau.ProcessStumpList(_stumps, --start, --end));
         }
         public ApiRespond ProcessRequest(int departmentId)
         {
@@ -104,13 +104,14 @@ namespace BureaucracySimulator
             
             precalcMutex.ReleaseMutex();
 
-            if (departmentId >= _bureau.DepartmentsNumber)
+            if (!InRange(_bureau.DepartmentsNumber, departmentId))
             {
                 throw new IndexOutOfRangeException("Incorrect department: now such department in this organization.");
             }
 
             string resultString = "";
             bool eternalCycle = false;
+            departmentId--;
 
             using (StreamReader sr = new StreamReader("data.json"))
             {
@@ -135,6 +136,11 @@ namespace BureaucracySimulator
             return result;
         }
 
+        private bool InRange(int end, int ind)
+        {
+            return ind <= end && ind > 0;
+        }
+
         public class ApiRespond
         {
             public int DepartmentId { get; }
@@ -145,7 +151,7 @@ namespace BureaucracySimulator
 
             public ApiRespond(int departmentId, bool eternalCycle, string stumpsData)
             {
-                DepartmentId = departmentId;
+                DepartmentId = departmentId + 1;
                 EternalCycle = eternalCycle;
                 UncrossedStumps = new List<List<int>>();
                 if (stumpsData == "")
@@ -163,6 +169,7 @@ namespace BureaucracySimulator
                         {
                             List<int> existingStumps = Enumerable.Range(0, stumpMask.Length)
                                 .Where(i => stumpMask[i] == '1')
+                                .Select(x => x + 1)
                                 .ToList();
                             UncrossedStumps.Add(existingStumps);
                         }
