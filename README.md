@@ -51,3 +51,12 @@ Expected that:
 * stamps are numbered from 1
 
 The API supports concurrent requests and concurrent adding new departments.
+
+_______________________________________________________________________________________________________________________________________________
+
+Тестовое покрытие (Test coverage)
+
+![image](https://user-images.githubusercontent.com/20307706/114309638-80e12780-9af0-11eb-921d-e27fa7c6665d.png)
+
+![image](https://user-images.githubusercontent.com/20307706/114309676-a837f480-9af0-11eb-8908-3891215a93a0.png)
+
