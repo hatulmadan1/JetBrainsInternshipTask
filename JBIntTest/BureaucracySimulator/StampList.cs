@@ -4,13 +4,13 @@ using System.Text;
 
 namespace BureaucracySimulator
 {
-    internal class StumpList
+    internal class StampList
     {
-        public BitArray StumpListArray { get; }
+        public BitArray StampListArray { get; }
 
-        public StumpList(int numberOfStumps)
+        public StampList(int numberOfStamps)
         {
-            StumpListArray = new BitArray(numberOfStumps, false);
+            StampListArray = new BitArray(numberOfStamps, false);
         }
 
         public void ChangeByDepartmentRule(Rule rule)
@@ -19,20 +19,20 @@ namespace BureaucracySimulator
             {
                 if (rule.Type == Rule.RuleType.Unconditional)
                 {
-                    StumpListArray[((UnconditionalRule)rule).InStump] = true;
-                    StumpListArray[((UnconditionalRule)rule).OutStump] = false;
+                    StampListArray[((UnconditionalRule)rule).InStamp] = true;
+                    StampListArray[((UnconditionalRule)rule).OutStamp] = false;
                 } 
                 else if (rule.Type == Rule.RuleType.Conditional)
                 {
-                    if (StumpListArray[((ConditionalRule)rule).ConditionalStampId])
+                    if (StampListArray[((ConditionalRule)rule).ConditionalStampId])
                     {
-                        StumpListArray[((ConditionalRule)rule).IfTrue.InStump] = true;
-                        StumpListArray[((ConditionalRule)rule).IfTrue.OutStump] = false;
+                        StampListArray[((ConditionalRule)rule).IfTrue.InStamp] = true;
+                        StampListArray[((ConditionalRule)rule).IfTrue.OutStamp] = false;
                     }
                     else
                     {
-                        StumpListArray[((ConditionalRule)rule).IfFalse.InStump] = true;
-                        StumpListArray[((ConditionalRule)rule).IfFalse.OutStump] = false;
+                        StampListArray[((ConditionalRule)rule).IfFalse.InStamp] = true;
+                        StampListArray[((ConditionalRule)rule).IfFalse.OutStamp] = false;
                     }
                 }
                 else
@@ -50,15 +50,15 @@ namespace BureaucracySimulator
 
         /*public override int GetHashCode()
         {
-            return StumpListArray.GetHashCode();
+            return StampListArray.GetHashCode();
         }*/
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < StumpListArray.Count; i++)
+            for (int i = 0; i < StampListArray.Count; i++)
             {
-                sb.Append(StumpListArray[i] ? '1' : '0');
+                sb.Append(StampListArray[i] ? '1' : '0');
             }
 
             return sb.ToString();

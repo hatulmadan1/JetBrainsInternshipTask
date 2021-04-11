@@ -23,14 +23,14 @@ namespace BureaucracySimulatorTests
 
             var result = api.ProcessRequest(1);
             Assert.IsTrue(result.IsVisited);
-            Assert.IsTrue(result.UncrossedStumps.Count == 1);
-            Assert.IsTrue(result.UncrossedStumps[0].Count == 1);
-            Assert.IsTrue(result.UncrossedStumps[0][0] == 1);
+            Assert.IsTrue(result.UncrossedStamps.Count == 1);
+            Assert.IsTrue(result.UncrossedStamps[0].Count == 1);
+            Assert.IsTrue(result.UncrossedStamps[0][0] == 1);
 
             result = api.ProcessRequest(2);
             Assert.IsTrue(result.IsVisited);
-            Assert.IsTrue(result.UncrossedStumps.Count == 1);
-            Assert.IsTrue(result.UncrossedStumps[0].Count == 1);
+            Assert.IsTrue(result.UncrossedStamps.Count == 1);
+            Assert.IsTrue(result.UncrossedStamps[0].Count == 1);
 
             result = api.ProcessRequest(3);
             Assert.IsFalse(result.IsVisited);
@@ -75,7 +75,7 @@ namespace BureaucracySimulatorTests
 
             var result = api.ProcessRequest(1);
             Assert.IsTrue(result.EternalCycle);
-            Assert.IsTrue(result.UncrossedStumps.Count == 1);
+            Assert.IsTrue(result.UncrossedStamps.Count == 1);
             result = api.ProcessRequest(3);
             Assert.IsFalse(result.IsVisited);
         }
@@ -100,9 +100,9 @@ namespace BureaucracySimulatorTests
 
             var result = api.ProcessRequest(1);
             result = api.ProcessRequest(2);
-            Assert.IsTrue(result.UncrossedStumps.Count == 2 
-                          && result.UncrossedStumps[0].Count == 2
-                          && result.UncrossedStumps[1].Count == 3);
+            Assert.IsTrue(result.UncrossedStamps.Count == 2 
+                          && result.UncrossedStamps[0].Count == 2
+                          && result.UncrossedStamps[1].Count == 3);
             result = api.ProcessRequest(3);
             Assert.IsFalse(result.EternalCycle);
             result = api.ProcessRequest(4);
@@ -137,10 +137,10 @@ namespace BureaucracySimulatorTests
                 task.Start();
             }
 
-            Assert.IsTrue(tasks[0].Result.IsVisited && tasks[0].Result.UncrossedStumps.Count == 1);
-            Assert.IsTrue(tasks[1].Result.IsVisited && tasks[1].Result.UncrossedStumps.Count == 2);
-            Assert.IsTrue(tasks[2].Result.IsVisited && tasks[2].Result.UncrossedStumps.Count == 1);
-            Assert.IsTrue(tasks[3].Result.IsVisited && tasks[3].Result.UncrossedStumps.Count == 1);
+            Assert.IsTrue(tasks[0].Result.IsVisited && tasks[0].Result.UncrossedStamps.Count == 1);
+            Assert.IsTrue(tasks[1].Result.IsVisited && tasks[1].Result.UncrossedStamps.Count == 2);
+            Assert.IsTrue(tasks[2].Result.IsVisited && tasks[2].Result.UncrossedStamps.Count == 1);
+            Assert.IsTrue(tasks[3].Result.IsVisited && tasks[3].Result.UncrossedStamps.Count == 1);
         }
 
         [TestMethod]
@@ -170,15 +170,15 @@ namespace BureaucracySimulatorTests
 
             var result = api.ProcessRequest(1);
             Assert.IsTrue(result.IsVisited);
-            Assert.IsTrue(result.UncrossedStumps.Count == 1);
-            Assert.IsTrue(result.UncrossedStumps[0].Count == 1);
-            Assert.IsTrue(result.UncrossedStumps[0][0] == 1);
+            Assert.IsTrue(result.UncrossedStamps.Count == 1);
+            Assert.IsTrue(result.UncrossedStamps[0].Count == 1);
+            Assert.IsTrue(result.UncrossedStamps[0][0] == 1);
 
             result = api.ProcessRequest(2);
             Assert.IsTrue(result.IsVisited);
-            Assert.IsTrue(result.UncrossedStumps.Count == 1);
-            Assert.IsTrue(result.UncrossedStumps[0].Count == 1);
-            Assert.IsTrue(result.UncrossedStumps[0][0] == 2);
+            Assert.IsTrue(result.UncrossedStamps.Count == 1);
+            Assert.IsTrue(result.UncrossedStamps[0].Count == 1);
+            Assert.IsTrue(result.UncrossedStamps[0][0] == 2);
 
             result = api.ProcessRequest(3);
             Assert.IsFalse(result.IsVisited);

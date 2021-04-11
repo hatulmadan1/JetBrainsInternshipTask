@@ -11,31 +11,33 @@ namespace BureaucracySimulator
     public class ApiProcessor
     {
         private Organization _bureau;
-        private StumpList _stumps;
+        private StampList _stamps;
 
         private Task precalc;
         private bool _isPrecalcReady;
         private Mutex precalcMutex = new Mutex();
 
-        public void StartSettingConfiguration(int departmentsNumber, int stumpsNumber)
+        public void StartSettingConfiguration(int departmentsNumber, int stampsNumber)
         {
+            // ??= is here to prevent losing data in case of more than one attempt to set
+            // number of departments and number of stamps
             _bureau ??= new Organization(departmentsNumber);
-            _stumps ??= new StumpList(stumpsNumber);
+            _stamps ??= new StampList(stampsNumber);
         }
         
         public void AddDepartmentWithConditionalRule(
             int departmentId,
-            int conditionalStump, 
-            int inStumpTrue, int outStumpTrue, int nextDepartmentTrue, 
-            int inStumpFalse, int outStumpFalse, int nextDepartmentFalse)
+            int conditionalStamp, 
+            int inStampTrue, int outStampTrue, int nextDepartmentTrue, 
+            int inStampFalse, int outStampFalse, int nextDepartmentFalse)
         {
-            if (!InRange(_stumps.StumpListArray.Count, conditionalStump) ||
-                !InRange(_stumps.StumpListArray.Count, inStumpTrue) ||
-                !InRange(_stumps.StumpListArray.Count, outStumpTrue) ||
-                !InRange(_stumps.StumpListArray.Count, inStumpFalse) ||
-                !InRange(_stumps.StumpListArray.Count, outStumpFalse))
+            if (!InRange(_stamps.StampListArray.Count, conditionalStamp) ||
+                !InRange(_stamps.StampListArray.Count, inStampTrue) ||
+                !InRange(_stamps.StampListArray.Count, outStampTrue) ||
+                !InRange(_stamps.StampListArray.Count, inStampFalse) ||
+                !InRange(_stamps.StampListArray.Count, outStampFalse))
             {
-                throw new IndexOutOfRangeException("Incorrect stump number: now such stump in this organization.");
+                throw new IndexOutOfRangeException("Incorrect stamp number: now such stamp in this organization.");
             }
 
             if (!InRange(_bureau.DepartmentsNumber, nextDepartmentTrue) ||
@@ -47,21 +49,21 @@ namespace BureaucracySimulator
                 --departmentId,
                 new Department(
                     new ConditionalRule(
-                        --conditionalStump, 
+                        --conditionalStamp, 
                         new UnconditionalRule(
-                            --inStumpTrue, --outStumpTrue, --nextDepartmentTrue), 
-                        new UnconditionalRule(--inStumpFalse, --outStumpFalse, --nextDepartmentFalse)
+                            --inStampTrue, --outStampTrue, --nextDepartmentTrue), 
+                        new UnconditionalRule(--inStampFalse, --outStampFalse, --nextDepartmentFalse)
                         ) 
                     )
                 );
         }
 
-        public void AddDepartmentWithUnconditionalRule(int departmentId, int inStump, int outStump, int nextDepartment)
+        public void AddDepartmentWithUnconditionalRule(int departmentId, int inStamp, int outStamp, int nextDepartment)
         {
-            if (!InRange(_stumps.StumpListArray.Count, inStump) ||
-                !InRange(_stumps.StumpListArray.Count, outStump))
+            if (!InRange(_stamps.StampListArray.Count, inStamp) ||
+                !InRange(_stamps.StampListArray.Count, outStamp))
             {
-                throw new IndexOutOfRangeException("Incorrect stump number: now such stump in this organization.");
+                throw new IndexOutOfRangeException("Incorrect stamp number: now such stamp in this organization.");
             }
 
             if (!InRange(_bureau.DepartmentsNumber, nextDepartment))
@@ -69,7 +71,7 @@ namespace BureaucracySimulator
                 throw new IndexOutOfRangeException("Incorrect next department: now such department in this organization.");
             }
 
-            _bureau.AddDepartment(--departmentId, new Department(new UnconditionalRule(--inStump, --outStump, --nextDepartment)));
+            _bureau.AddDepartment(--departmentId, new Department(new UnconditionalRule(--inStamp, --outStamp, --nextDepartment)));
         }
 
         public void SetStartEndDepartments(int start, int end)
@@ -84,7 +86,7 @@ namespace BureaucracySimulator
                 throw new IndexOutOfRangeException("Incorrect end department: now such department in this organization.");
             }
 
-            precalc = new Task(() => _bureau.ProcessStumpList(_stumps, --start, --end));
+            precalc = new Task(() => _bureau.ProcessStampList(_stamps, --start, --end));
         }
         public ApiRespond ProcessRequest(int departmentId)
         {
@@ -147,31 +149,31 @@ namespace BureaucracySimulator
             public bool EternalCycle { get; }
             public bool IsVisited { get; }
 
-            public List<List<int>> UncrossedStumps { get; }
+            public List<List<int>> UncrossedStamps { get; }
 
-            public ApiRespond(int departmentId, bool eternalCycle, string stumpsData)
+            public ApiRespond(int departmentId, bool eternalCycle, string stampsData)
             {
                 DepartmentId = departmentId + 1;
                 EternalCycle = eternalCycle;
-                UncrossedStumps = new List<List<int>>();
-                if (stumpsData == "")
+                UncrossedStamps = new List<List<int>>();
+                if (stampsData == "")
                 {
                     IsVisited = false;
                 }
                 else
                 {
                     IsVisited = true;
-                    var data = JsonSerializer.Deserialize<KeyValuePair<int, Dictionary<int, List<string>>>>(stumpsData).Value.Values;
+                    var data = JsonSerializer.Deserialize<KeyValuePair<int, Dictionary<int, List<string>>>>(stampsData).Value.Values;
                     
                     foreach (var elem in data)
                     {
-                        foreach (var stumpMask in elem)
+                        foreach (var stampMask in elem)
                         {
-                            List<int> existingStumps = Enumerable.Range(0, stumpMask.Length)
-                                .Where(i => stumpMask[i] == '1')
+                            List<int> existingStamps = Enumerable.Range(0, stampMask.Length)
+                                .Where(i => stampMask[i] == '1')
                                 .Select(x => x + 1)
                                 .ToList();
-                            UncrossedStumps.Add(existingStumps);
+                            UncrossedStamps.Add(existingStamps);
                         }
                     }
                 }

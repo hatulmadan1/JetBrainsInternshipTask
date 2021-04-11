@@ -11,7 +11,7 @@ namespace BureaucracySimulator
             DepartmentRule = rule;
         }
 
-        public int ProcessVisit(StumpList stumpList)
+        public int ProcessVisit(StampList stampList)
         {
             try
             {
@@ -23,7 +23,7 @@ namespace BureaucracySimulator
                         break;
                     case Rule.RuleType.Conditional:
                         nextDepartment = 
-                            stumpList.StumpListArray[((ConditionalRule)DepartmentRule).ConditionalStampId] 
+                            stampList.StampListArray[((ConditionalRule)DepartmentRule).ConditionalStampId] 
                                 ? ((ConditionalRule)DepartmentRule).IfTrue.NextDepartment 
                                 : ((ConditionalRule)DepartmentRule).IfFalse.NextDepartment;
                         break;
@@ -31,7 +31,7 @@ namespace BureaucracySimulator
                         throw new Exception("Department has no rule type, undefined behaviour");
                 }
 
-                stumpList.ChangeByDepartmentRule(DepartmentRule);
+                stampList.ChangeByDepartmentRule(DepartmentRule);
                 return nextDepartment;
             }
             catch (Exception e)

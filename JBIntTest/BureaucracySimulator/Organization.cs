@@ -37,7 +37,7 @@ namespace BureaucracySimulator
             return DepartmentsNumber == _actualDepartmentsNumber;
         }
 
-        public void ProcessStumpList(StumpList stumpList, int start, int end)
+        public void ProcessStampList(StampList stampList, int start, int end)
         {
             try
             {
@@ -52,9 +52,9 @@ namespace BureaucracySimulator
                     {
                         masks.Add(departmentId, new Dictionary<int, List<string>>());
                     }
-                    nextDepartmentId = Departments[departmentId].ProcessVisit(stumpList);
+                    nextDepartmentId = Departments[departmentId].ProcessVisit(stampList);
                     
-                    string currentMask = stumpList.ToString();
+                    string currentMask = stampList.ToString();
                     int currentMaskHash = currentMask.GetHashCode();
                     if (!masks[departmentId].ContainsKey(currentMaskHash))
                     {

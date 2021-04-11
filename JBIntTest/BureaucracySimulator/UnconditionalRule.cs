@@ -4,15 +4,15 @@ namespace BureaucracySimulator
 {
     internal class UnconditionalRule : Rule
     {
-        public int InStump { get; protected set; }
-        public int OutStump { get; protected set; }
+        public int InStamp { get; protected set; }
+        public int OutStamp { get; protected set; }
         public int NextDepartment { get; protected set; }
 
-        public UnconditionalRule(int inStump, int outStump, int nextDepartment)
+        public UnconditionalRule(int inStamp, int outStamp, int nextDepartment)
         {
             Type = RuleType.Unconditional;
-            InStump = inStump;
-            OutStump = outStump;
+            InStamp = inStamp;
+            OutStamp = outStamp;
             NextDepartment = nextDepartment;
         }
     }
