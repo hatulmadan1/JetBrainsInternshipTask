@@ -20,8 +20,8 @@
 
 Ожидается, что: 
 * число департаментов, добавляемых пользователем в конфигурацию, в точности соответствует заявленному
-* департаменты нумеруются с 0
-* печати нумеруются с 0
+* департаменты нумеруются с 1
+* печати нумеруются с 1
 
 API поддерживает конкурентные запросы и конкурентное добавление департаментов. 
 
@@ -47,7 +47,7 @@ It returns an object of `ApiRespond` class, which contains the following fields 
 
 Expected that:
 * the number of departments added by the user to the configuration exactly corresponds to the declared one
-* departments are numbered from 0
-* stamps are numbered from 0
+* departments are numbered from 1
+* stamps are numbered from 1
 
 The API supports concurrent requests and concurrent adding new departments.
