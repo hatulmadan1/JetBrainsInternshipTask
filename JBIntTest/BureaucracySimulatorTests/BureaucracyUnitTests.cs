@@ -183,5 +183,39 @@ namespace BureaucracySimulatorTests
             result = api.ProcessRequest(3);
             Assert.IsFalse(result.IsVisited);
         }
+
+        [TestMethod]
+        public void BigTest()
+        {
+            int n = 1000, m = 1000;
+            ApiProcessor api = new ApiProcessor();
+            api.StartSettingConfiguration(n, m);
+            
+            List<Task> addTasks = new List<Task>();
+            for (int i = 1; i <= n; i++)
+            {
+                var i1 = i;
+                addTasks.Add(new Task(() => api.AddDepartmentWithUnconditionalRule(i1, i1, (i1 + 1) % n + 1, (i1 + 1) % n + 1)));
+            }
+            foreach (var task in addTasks)
+            {
+                task.Start();
+            }
+            Task.WaitAll(addTasks.ToArray());
+
+            api.SetStartEndDepartments(1, n);
+
+            List<Task> requestTasks = new List<Task>();
+            for (int i = 1; i < n; i++)
+            {
+                var i1 = i;
+                requestTasks.Add(new Task(() => api.ProcessRequest(i1)));
+            }
+            foreach (var task in requestTasks)
+            {
+                task.Start();
+            }
+            Task.WaitAll(requestTasks.ToArray());
+        }
     }
 }

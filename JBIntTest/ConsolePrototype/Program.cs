@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading.Tasks;
 using BureaucracySimulator;
 
 namespace ConsolePrototype
@@ -8,22 +10,40 @@ namespace ConsolePrototype
     {
         static void Main(string[] args)
         {
+            var start = DateTime.Now;
+            int n = 1500, m = 1500;
             ApiProcessor api = new ApiProcessor();
-            api.StartSettingConfiguration(4, 6);
-            api.AddDepartmentWithUnconditionalRule(0, 0, 4, 1);
-            api.AddDepartmentWithConditionalRule(1, 2, 1, 5, 3, 5, 3, 2);
-            api.AddDepartmentWithUnconditionalRule(2, 2, 3, 1);
-            api.AddDepartmentWithUnconditionalRule(3, 3, 0, 0);
-            api.SetStartEndDepartments(0, 3);
+            api.StartSettingConfiguration(n, m);
 
-            var result = api.ProcessRequest(0);
-            Console.WriteLine(JsonSerializer.Serialize(result));
-            result = api.ProcessRequest(1);
-            Console.WriteLine(JsonSerializer.Serialize(result));
-            result = api.ProcessRequest(2);
-            Console.WriteLine(JsonSerializer.Serialize(result));
-            result = api.ProcessRequest(3);
-            Console.WriteLine(JsonSerializer.Serialize(result));
+            List<Task> addTasks = new List<Task>();
+            for (int i = 1; i <= n; i++)
+            {
+                var i1 = i;
+                addTasks.Add(new Task(() => api.AddDepartmentWithUnconditionalRule(i1, i1, (i1 + 1) % n + 1, (i1 + 1) % n + 1)));
+            }
+            foreach (var task in addTasks)
+            {
+                task.Start();
+            }
+            Task.WaitAll(addTasks.ToArray());
+
+            api.SetStartEndDepartments(1, n);
+
+            Console.WriteLine(DateTime.Now - start);
+
+            List<Task> requestTasks = new List<Task>();
+            for (int i = 1; i < n; i++)
+            {
+                var i1 = i;
+                requestTasks.Add(new Task(() => api.ProcessRequest(i1)));
+            }
+            foreach (var task in requestTasks)
+            {
+                task.Start();
+            }
+            Task.WaitAll(requestTasks.ToArray());
+
+            Console.WriteLine(DateTime.Now - start);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -151,6 +152,8 @@ namespace BureaucracySimulator
 
             public List<List<int>> UncrossedStamps { get; }
 
+            ReaderWriterLock saveResults = new ReaderWriterLock();
+
             public ApiRespond(int departmentId, bool eternalCycle, string stampsData)
             {
                 DepartmentId = departmentId + 1;
@@ -164,19 +167,25 @@ namespace BureaucracySimulator
                 {
                     IsVisited = true;
                     var data = JsonSerializer.Deserialize<KeyValuePair<int, Dictionary<int, List<string>>>>(stampsData).Value.Values;
-                    
-                    foreach (var elem in data)
-                    {
-                        foreach (var stampMask in elem)
-                        {
-                            //get positions of 1 in the mask
-                            List<int> existingStamps = Enumerable.Range(0, stampMask.Length)
-                                .Where(i => stampMask[i] == '1')
-                                .Select(x => x + 1)
-                                .ToList();
-                            UncrossedStamps.Add(existingStamps);
-                        }
-                    }
+
+                    Parallel.ForEach(data, elem =>
+                        Parallel.ForEach(elem, stampMask =>
+                            {
+                                //get positions of 1 in the mask
+                                List<int> existingStamps = Enumerable.Range(0, stampMask.Length)
+                                    .Where(i => stampMask[i] == '1')
+                                    .Select(x => x + 1)
+                                    .ToList();
+                                
+                                saveResults.AcquireWriterLock(10);
+
+                                UncrossedStamps.Add(existingStamps);
+
+                                saveResults.ReleaseWriterLock();
+                            }
+
+                        )
+                    );
                 }
             }
         }

@@ -13,7 +13,7 @@ namespace BureaucracySimulator
 
         private int _actualDepartmentsNumber;
 
-        private Mutex _addDepartmentMutex = new Mutex();
+        private ReaderWriterLock _addDepartmentMutex = new ReaderWriterLock();
 
         public Organization(int departmentsNumber)
         {
@@ -24,12 +24,12 @@ namespace BureaucracySimulator
 
         public void AddDepartment(int departmentId,  Department department)
         {
-            _addDepartmentMutex.WaitOne();
+            _addDepartmentMutex.AcquireWriterLock(10);
 
             Departments[departmentId] = department;
-            _actualDepartmentsNumber++;
-            
-            _addDepartmentMutex.ReleaseMutex();
+
+            _addDepartmentMutex.ReleaseLock();
+            Interlocked.Increment(ref _actualDepartmentsNumber);
         }
 
         public bool IsConfigCorrect()
