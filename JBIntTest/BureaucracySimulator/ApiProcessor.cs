@@ -91,7 +91,7 @@ namespace BureaucracySimulator
         public ApiRespond ProcessRequest(int departmentId)
         {
             precalcMutex.WaitOne();
-            
+            //in case of no one called precalc, call precalc and wait for if
             if (!_isPrecalcReady)
             {
                 if (!_bureau.IsConfigCorrect())
@@ -169,6 +169,7 @@ namespace BureaucracySimulator
                     {
                         foreach (var stampMask in elem)
                         {
+                            //get positions of 1 in the mask
                             List<int> existingStamps = Enumerable.Range(0, stampMask.Length)
                                 .Where(i => stampMask[i] == '1')
                                 .Select(x => x + 1)

@@ -41,6 +41,17 @@ namespace BureaucracySimulator
         {
             try
             {
+                /*
+                 * in order to avoid hash collision in case of more than 2^32 masks
+                 * I keep masks grouped by their hash.
+                 * (Dictionary use GetHashCode which returns int that means that we
+                 * could only keep 2^32 different masks in Dictionary
+                 * Mask is a bit sequence, all masks have same length (number of stamps)
+                 * Number of possible masks with length x equals to 2^x
+                 * So, default Dictionary could get a collision in case of 32 or more stumps
+                 * and lots of departments (lots means at least integer, because if every
+                 * department has a conditional rule, we get 2 * numberOfDepartments masks)
+                 */
                 Dictionary<int, Dictionary<int, List<string>>> masks = new Dictionary<int, Dictionary<int, List<string>>>();
                 int departmentId = start, nextDepartmentId = start;
                 bool eternalCycle = false;
